@@ -55,38 +55,11 @@ sysFiles = [
     '/etc/resolv.conf',
     '/etc/fstab',
     '/etc/passwd',
+    '/proc/cmdline'
     #'/etc/shadow',
     '/etc/group',
     #'/etc/sudoers',
 ]
-
-# RHEL SYSFILES
-
-# Ubuntu SYSFILES
-
-'''
-EXEC = [
-    '/bin/uname -r',
-    'mount | column -t',
-    #sticky bit files
-    '/usr/bin/find / -perm -g=s -o -perm -4000 ! type l -maxdepth 3 -exec ls -ld {} \; 2>/dev/null',
-    #world directories
-    '/usr/bin/find / -perm 222 -type d 2>/dev/null',
-    #world writeable files
-    '/usr/bin/find / -perm 0777 -type f 2>/dev/null'
-    '/usr/bin/find / -user $(whoami) 2>/dev/null',
-    '/usr/bin/w',
-    '/usr/bin/'last',
-    '/usr/bin/ps -ef | grep root'
-]
-'''
-
-# Define function to read files and write to output
-
-#def rootCheck():
-#   if os.euid() == 0
-
-
 
 def fileRead(file_list):
     for i in file_list:
@@ -110,15 +83,6 @@ outFile.write('\n')
 outFile.write('\n')
 outFile.write(netOut)
 
-#Determine if Debian, RHEL
-
-'''
-if osType[0] == 'Ubuntu':
-    fileRead(DEBIAN)
-else:
-    fileRead(RHEL)
-'''
-
 # List directories
 
 treeFile = open(args.directory + '/dirwalk', 'w+')
@@ -129,15 +93,3 @@ for root, dirs, filenames in os.walk('/home/'):
     for name in dirs:
         treeFile.write('\n')
         treeFile.write(os.path.join(root, name))
-
-'''
-# Exfil collected data (zip up, SCP back to remote host)
-
-# Netcat persistance with Bash
-
-subprocess.Popen(['nc', '-l', '-p', '9999'])
-
-# Cleanup log files to remove traces of recon from system
-
-outFile.close()
-'''
