@@ -49,7 +49,6 @@ workDir = os.mkdir(args.directory)
 osType = platform.linux_distribution()
 outFile = open(args.directory + '/coreData', 'w+')
 
-
 ##################################################################################################
 #Function to get process list //Bustamante
 ##################################################################################################
@@ -72,10 +71,12 @@ def getProcess():
         f.close()
 
         #get process info from /proc/status
-        for ln in open(directory + proc + "/status"):
+        f = open(directory + proc + "/status")
+	for ln in f:
 	    if ln.startswith("Uid:"):
 		uid = ln.split()[1]
 		user = pwd.getpwuid(int(uid)).pw_name
+	f.close
 
 	#get process info from /proc/cmdline
 	f = open(directory + proc + '/cmdline')
@@ -96,7 +97,7 @@ sysFiles = [
     '/etc/resolv.conf',
     '/etc/fstab',
     '/etc/passwd',
-    '/proc/cmdline'
+    '/proc/cmdline',
     #'/etc/shadow',
     '/etc/group',
     #'/etc/sudoers',
