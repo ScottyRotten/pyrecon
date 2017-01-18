@@ -34,7 +34,7 @@ import os
 import subprocess
 import platform
 import tarfile
-
+import pwd
 ##########################################
 
 # parse arguements from command line/help file documentation
@@ -48,6 +48,47 @@ args = parser.parse_args()
 workDir = os.mkdir(args.directory)
 osType = platform.linux_distribution()
 outFile = open(args.directory + '/coreData', 'w+')
+
+
+##################################################################################################
+#Function to get process list //Bustamante
+##################################################################################################
+def getProcess():
+    directory  = '/proc/'
+    processesFile = open(args.directory + '/processes', 'w+')
+
+    tableformat = "{:<14} {:<6} {:<6} {:<20} {:<30}\n"
+    proclist  = [item for item in os.listdir(directory) if item.isdigit()] 
+
+    #Table Header
+    processesFile.write(tableformat.format('USER', 'PID', 'PPID', 'PROCESS', 'COMMAND'))
+    #processesFile.write("\n")
+
+    #enumerate /proc directory looking for process information
+    for proc in proclist:
+        #get process info from /proc/stat
+        f = open(directory + proc + "/stat")
+	procstat = f.read().split()
+        f.close()
+
+        #get process info from /proc/status
+        for ln in open(directory + proc + "/status"):
+	    if ln.startswith("Uid:"):
+		uid = ln.split()[1]
+		user = pwd.getpwuid(int(uid)).pw_name
+
+	#get process info from /proc/cmdline
+	f = open(directory + proc + '/cmdline')
+	temp = f.read()
+
+	if len(temp) != 0:
+	    cmd = temp
+	else: 
+	    cmd = "[" + procstat[1][1:-1] + "]"
+	
+	processesFile.write(tableformat.format(user, procstat[0], procstat[3], procstat[1], cmd)) 
+
+##################################################################################################
 
 # Common SYSFILES
 sysFiles = [
@@ -130,6 +171,10 @@ for root, dirs, filenames in os.walk('/home/'):
         treeFile.write('\n')
         treeFile.write(os.path.join(root, name))
 
+#Get process list
+getProcess()
+
+
 '''
 # Exfil collected data (zip up, SCP back to remote host)
 
@@ -141,3 +186,5 @@ subprocess.Popen(['nc', '-l', '-p', '9999'])
 
 outFile.close()
 '''
+
+
