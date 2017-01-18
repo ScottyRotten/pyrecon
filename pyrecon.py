@@ -83,8 +83,8 @@ EXEC = [
 
 # Define function to read files and write to output
 
-def rootCheck():
-    if os.euid() == 0:
+#def rootCheck():
+#   if os.euid() == 0
 
 
 
