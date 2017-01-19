@@ -35,6 +35,7 @@ import subprocess
 import platform
 import tarfile
 import pwd
+import zipfile
 ##########################################
 
 # parse arguements from command line/help file documentation
@@ -48,6 +49,7 @@ args = parser.parse_args()
 workDir = os.mkdir(args.directory)
 osType = platform.linux_distribution()
 outFile = open(args.directory + '/coreData', 'w+')
+
 
 ##################################################################################################
 #Function to get process list //Bustamante
@@ -90,6 +92,24 @@ def getProcess():
 	processesFile.write(tableformat.format(user, procstat[0], procstat[3], procstat[1], cmd)) 
 
 ##################################################################################################
+
+
+##################################################################################################
+# Function to zip files in working directory //Bustamante
+##################################################################################################
+
+def zipit():
+    workDir = args.directory
+    fileList = os.listdir(workDir)
+    z = zipfile.ZipFile(workDir + "/extractpoint.zip", mode="w")
+    for files in fileList:
+        z.write(workDir + "/" + files)
+        print("Zipping: " + files)
+
+
+##################################################################################################
+
+
 
 # Common SYSFILES
 sysFiles = [
@@ -136,8 +156,9 @@ for root, dirs, filenames in os.walk('/home/'):
         treeFile.write('\n')
         treeFile.write(os.path.join(root, name))
 
-#Get process list
 getProcess()
+zipit()
+
 
 
 '''
