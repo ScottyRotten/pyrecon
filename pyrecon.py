@@ -26,8 +26,9 @@ __license__ = "GPLv3"
 __version__ = ".1"
 __maintainer__ = "scottyrotten, liltone2002"
 
-##########################################
-# Libraries
+##################################################################################################
+#Libraries
+##################################################################################################
 
 import argparse
 import os
@@ -36,24 +37,33 @@ import platform
 import tarfile
 import pwd
 import zipfile
-##########################################
 
-# parse arguements from command line/help file documentation
+##################################################################################################
+#Setup
+##################################################################################################
+
+workDir = os.mkdir(args.directory)
+osType = platform.linux_distribution()
+outFile = open(args.directory + '/coreData', 'w+')
+sysFiles = [
+    '/etc/issue',
+    '/etc/resolv.conf',
+    '/etc/fstab',
+    '/etc/passwd',
+    '/proc/cmdline',
+    #'/etc/shadow',
+    '/etc/group',
+    #'/etc/sudoers',
+]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--directory', help='directory for output', required='True', action='store')
 args = parser.parse_args()
 
-# Setup
-
-workDir = os.mkdir(args.directory)
-osType = platform.linux_distribution()
-outFile = open(args.directory + '/coreData', 'w+')
-
-
 ##################################################################################################
 #Function to get process list //Bustamante
 ##################################################################################################
+
 def getProcess():
     directory  = '/proc/'
     processesFile = open(args.directory + '/processes', 'w+')
@@ -92,9 +102,6 @@ def getProcess():
 	processesFile.write(tableformat.format(user, procstat[0], procstat[3], procstat[1], cmd)) 
 
 ##################################################################################################
-
-
-##################################################################################################
 # Function to zip files in working directory //Bustamante
 ##################################################################################################
 
@@ -108,20 +115,8 @@ def zipit():
 
 
 ##################################################################################################
-
-
-
-# Common SYSFILES
-sysFiles = [
-    '/etc/issue',
-    '/etc/resolv.conf',
-    '/etc/fstab',
-    '/etc/passwd',
-    '/proc/cmdline',
-    #'/etc/shadow',
-    '/etc/group',
-    #'/etc/sudoers',
-]
+# Function read a list of files and send output to a single file //Scott
+##################################################################################################
 
 def fileRead(file_list):
     for i in file_list:
@@ -133,7 +128,11 @@ def fileRead(file_list):
             outFile.write('\n')
             outFile.write(file.read())
 
-#MAIN
+
+
+###################################################################################################
+# Main
+##################################################################################################
 
 fileRead(sysFiles)
 
@@ -158,19 +157,4 @@ for root, dirs, filenames in os.walk('/home/'):
 
 getProcess()
 zipit()
-
-
-
-'''
-# Exfil collected data (zip up, SCP back to remote host)
-
-# Netcat persistance with Bash
-
-subprocess.Popen(['nc', '-l', '-p', '9999'])
-
-# Cleanup log files to remove traces of recon from system
-
-outFile.close()
-'''
-
 
