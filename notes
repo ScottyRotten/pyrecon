@@ -1,0 +1,3 @@
+workDir = os.mkdir(args.directory)
+#os.mkdir doesn't actually return anything. Consider channing to..
+workDir = args.directory
